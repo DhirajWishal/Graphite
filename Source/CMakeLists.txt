@@ -19,6 +19,8 @@ set(
 	SOURCES
 
 	"Main.cpp"
+	"Application.cpp"
+	"Application.hpp"
 
 	${SHADERS}
 )
@@ -48,10 +50,21 @@ target_include_directories(
 )
 
 # Add the target links.
-target_link_libraries(Graphite GraphiteThirdParty_ImGui GraphiteThirdParty_Optick)
+target_link_libraries(Graphite GraphiteThirdParty_ImGui GraphiteThirdParty_Optick SDL3-shared)
 
 # Make sure to specify the C++ standard to C++20.
 set_property(TARGET Graphite PROPERTY CXX_STANDARD 20)
+
+# Copy the SDL shared library to the output directory.
+add_custom_command(
+	TARGET Graphite 
+	POST_BUILD
+
+	COMMENT "Copying SDL shared library to the output directory."
+	COMMAND ${CMAKE_COMMAND} -E copy
+		$<TARGET_FILE:SDL3-shared>
+		$<TARGET_FILE_DIR:Graphite>/$<TARGET_FILE_NAME:SDL3-shared>
+)
 
 # If we are on MSVC, we can use the Multi Processor Compilation option.
 if (MSVC)

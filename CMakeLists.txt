@@ -44,6 +44,7 @@ set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glm)
 set(XXHASH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/xxHash)
 set(OPTICK_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/optick/src)
 set(IMGUI_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/imgui)
+set(SDL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SDL/include)
 
 # Add the Optick library as a third party static link.
 add_library(
@@ -130,6 +131,9 @@ add_compile_definitions(
 	GRAPHITE_LOG_LEVEL=${GRAPHITE_LOG_LEVEL}
 )
 
+# Add the SDL as a subdirectory.
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SDL)
+
 # Include the main subdirectories.
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
@@ -157,6 +161,9 @@ if (MSVC)
 	set_target_properties(
 		GraphiteThirdParty_Optick
 		GraphiteThirdParty_ImGui
+		SDL3_test
+		SDL3-shared
+		uninstall
 			
 		PROPERTIES FOLDER "ThirdParty"
 	)

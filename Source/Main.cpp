@@ -1,8 +1,9 @@
 // Copyright (c) 2023 Dhiraj Wishal
 
-#include <spdlog/spdlog.h>
+#include "Application.hpp"
 
 int main()
 {
-	spdlog::info("Welcome to Graphite!");
+	Application application;
+	return application.execute();
 }
