@@ -84,6 +84,9 @@ target_include_directories(
 	PRIVATE ${VULKAN_HEADERS_INCLUDE_DIR}
 )
 
+# Make sure to specify the C++ standard to C++20.
+set_property(TARGET GraphiteThirdParty_Optick PROPERTY CXX_STANDARD 20)
+
 # Add the ImGui library as a third party static link.
 add_library(
 	GraphiteThirdParty_ImGui
@@ -101,6 +104,9 @@ add_library(
 	"${IMGUI_INCLUDE_DIR}/imstb_textedit.h"
 	"${IMGUI_INCLUDE_DIR}/imstb_truetype.h"
 )
+
+# Make sure to specify the C++ standard to C++20.
+set_property(TARGET GraphiteThirdParty_ImGui PROPERTY CXX_STANDARD 20)
 
 # Set global compile definitions.
 add_compile_definitions(
