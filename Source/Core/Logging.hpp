@@ -4,16 +4,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include <source_location>
 
-/**
- * Graphite no-op function.
- * This function compiles down to nothing and the compiler can optimize it out when needed.
- *
- * @tparam Arguments The argument types that can be passed to the function.
- */
-template<class... Arguments>
-constexpr void NoOp(Arguments&&...) noexcept {}
+#ifdef __cpp_lib_source_location
+#	if __cpp_lib_source_location == 201907L
+#include <source_location>
 
 /**
  * Log a trace to the console.
@@ -27,6 +21,24 @@ void TraceLog(std::source_location&& location, Message&& message)
 {
 	spdlog::info("[Trace \"{}\":{}] {}", location.file_name(), location.line(), std::move(message));
 }
+
+#		define GRAPHITE_TRACE_FUNCTION(format, ...)	::TraceLog(std::source_location::current(), fmt::format(format, __VA_ARGS__))
+
+#endif
+
+#else
+#	define GRAPHITE_TRACE_FUNCTION(format, ...)	::spdlog::info("[Trace \"{}\":{}] {}", __FILE__, __LINE__, fmt::format(format, __VA_ARGS__))
+
+#endif
+
+/**
+ * Graphite no-op function.
+ * This function compiles down to nothing and the compiler can optimize it out when needed.
+ *
+ * @tparam Arguments The argument types that can be passed to the function.
+ */
+template<class... Arguments>
+constexpr void NoOp(Arguments&&...) noexcept {}
 
 /**
  * Graphite log level defines the types of logging that can be done by the engine.
@@ -53,7 +65,7 @@ void TraceLog(std::source_location&& location, Message&& message)
 #					define GRAPHITE_LOG_INFORMATION(...)			::spdlog::info(__VA_ARGS__)
 
 #					if GRAPHITE_LOG_LEVEL > 4
-#						define GRAPHITE_LOG_TRACE(msg,...)			::TraceLog(std::source_location::current(), fmt::format(msg, __VA_ARGS__))
+#						define GRAPHITE_LOG_TRACE(msg,...)			GRAPHITE_TRACE_FUNCTION(msg, __VA_ARGS__)
 
 #					endif
 #				endif
@@ -102,7 +114,7 @@ void TraceLog(std::source_location&& location, Message&& message)
 	if (std::chrono::year(_year)/_month/_day >= std::chrono::year_month_day(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())))	\
 		GRAPHITE_LOG_TRACE("TODO: " __VA_ARGS__)
 
-#define GRAPHITE_FIXME(_day, _month, _year, ...)																											\
+#define GRAPHITE_FIXME(_day, _month, _year, ...)																										\
 	if (std::chrono::year(_year)/_month/_day >= std::chrono::year_month_day(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())))	\
 		GRAPHITE_LOG_TRACE("FIXME: " __VA_ARGS__)
 

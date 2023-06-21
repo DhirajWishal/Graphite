@@ -5,6 +5,7 @@
 #include "Core/Logging.hpp"
 
 #include <SDL3/SDL.h>
+#include <optick.h>
 
 Application::Application()
 {
@@ -16,6 +17,8 @@ Application::Application()
 		GRAPHITE_LOG_FATAL("Failed to initialize SDL!");
 		return;
 	}
+
+	GRAPHITE_LOG_INFORMATION("SDL initialized successfully.");
 }
 
 Application::~Application()
@@ -29,7 +32,7 @@ int Application::execute()
 	// Main iteration loop.
 	while (m_bShoudRun)
 	{
-
+		OPTICK_FRAME("Main loop");
 	}
 
 	return 0;
