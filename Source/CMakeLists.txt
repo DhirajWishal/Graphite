@@ -22,6 +22,8 @@ set(
 	"Application.cpp"
 	"Application.hpp"
 
+	"Core/Logging.hpp"
+
 	${SHADERS}
 )
 

@@ -2,11 +2,26 @@
 
 #include "Application.hpp"
 
-#include <spdlog/spdlog.h>
+#include "Core/Logging.hpp"
+
+#include <SDL3/SDL.h>
 
 Application::Application()
 {
 	spdlog::info("Welcome to Graphite!");
+
+	// Try and initialize SDL.
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
+	{
+		GRAPHITE_LOG_FATAL("Failed to initialize SDL!");
+		return;
+	}
+}
+
+Application::~Application()
+{
+	// Quit SDL.
+	SDL_Quit();
 }
 
 int Application::execute()

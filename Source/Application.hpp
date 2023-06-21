@@ -15,6 +15,11 @@ public:
 	Application();
 
 	/**
+	 * Destructor.
+	 */
+	~Application();
+
+	/**
 	 * Execute function.
 	 * This contains the main loop.
 	 *
