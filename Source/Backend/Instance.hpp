@@ -7,7 +7,7 @@
 #if defined(GRAPHITE_PLATFORM_WINDOWS)
 #	define VK_USE_PLATFORM_WIN32_KHR
 
-#elif defined(GRAPHITE_PLATFORM_MACOS)
+#elif defined(GRAPHITE_PLATFORM_MAC)
 #	define VK_USE_PLATFORM_MACOS_MVK
 
 #elif defined(GRAPHITE_PLATFORM_LINUX_X11)
@@ -23,6 +23,7 @@
 #endif
 
 #include <volk.h>
+#include <vk_mem_alloc.h>
 
 #include <vector>
 #include <array>
@@ -66,7 +67,7 @@ public:
 public:
 	/**
 	 * Get the graphics queue object.
-	 * 
+	 *
 	 * @return The guarded queue.
 	 */
 	[[nodiscard]] Guarded<VulkanQueue>& getGraphicsQueue() { return m_Queues[0]; }
@@ -122,6 +123,11 @@ private:
 	 */
 	void createLogicalDevice();
 
+	/**
+	 * Create the Vulkan memory allocator.
+	 */
+	void createMemoryAllocator();
+
 private:
 	VkPhysicalDeviceProperties m_PhysicalDeviceProperties;
 
@@ -131,11 +137,13 @@ private:
 
 	VolkDeviceTable m_DeviceTable;
 
-	VkInstance m_Instance;
-	VkDebugUtilsMessengerEXT m_DebugMessenger;
+	VkInstance m_Instance = VK_NULL_HANDLE;
+	VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 
-	VkPhysicalDevice m_PhysicalDevice;
-	VkDevice m_LogicalDevice;
+	VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+	VkDevice m_LogicalDevice = VK_NULL_HANDLE;
+
+	Guarded<VmaAllocator> m_Allocator = nullptr;
 
 	std::vector<const char*> m_ValidationLayers;
 	std::vector<const char*> m_DeviceExtensions;

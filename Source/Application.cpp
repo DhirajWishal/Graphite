@@ -9,8 +9,6 @@
 
 Application::Application()
 {
-	spdlog::info("Welcome to Graphite!");
-
 	// Try and initialize SDL.
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{

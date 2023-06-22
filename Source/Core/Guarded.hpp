@@ -27,14 +27,14 @@ public:
 	 *
 	 * @param value The value to be copied.
 	 */
-	explicit Guarded(const Type& value) : m_Variable(value) {}
+	Guarded(const Type& value) : m_Variable(value) {}
 
 	/**
 	 * Move constructor for the variable.
 	 *
 	 * @param value The value to be moved.
 	 */
-	explicit Guarded(Type&& value) : m_Variable(std::move(value)) {}
+	Guarded(Type&& value) : m_Variable(std::move(value)) {}
 
 	/**
 	 * Default copy constructor.

@@ -29,6 +29,8 @@ set(
 	"Backend/Instance.cpp"
 	"Backend/Instance.hpp"
 
+	"Backend/ThirdParty/vk_mem_alloc.cpp"
+
 	${SHADERS}
 )
 

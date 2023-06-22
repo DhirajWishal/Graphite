@@ -8,7 +8,12 @@
 
 namespace /* anonymous */
 {
-	std::vector<const char*> GetRequiredInstanceExtensions()
+	/**
+	 * Get the required instance extensions.
+	 *
+	 * @return The required instance extensions.
+	 */
+	[[nodiscard]] std::vector<const char*> GetRequiredInstanceExtensions()
 	{
 		std::vector<const char*> extensions = { VK_KHR_SURFACE_EXTENSION_NAME , VK_KHR_DISPLAY_EXTENSION_NAME };
 
@@ -289,6 +294,9 @@ Instance::Instance()
 
 	// Create the logical device.
 	createLogicalDevice();
+
+	// Create the memory allocator.
+	createMemoryAllocator();
 }
 
 Instance::~Instance()
@@ -504,24 +512,10 @@ void Instance::createLogicalDevice()
 	features.fragmentStoresAndAtomics = VK_TRUE;
 	features.fillModeNonSolid = VK_TRUE;
 
-	VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {};
-	bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-	bufferDeviceAddressFeatures.bufferDeviceAddress = VK_TRUE;
-
-	VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {};
-	rayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-	rayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
-	rayTracingPipelineFeatures.pNext = &bufferDeviceAddressFeatures;
-
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {};
-	accelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-	accelerationStructureFeatures.accelerationStructure = VK_TRUE;
-	accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
-
 	// Setup the device create info.
 	VkDeviceCreateInfo deviceCreateInfo = {};
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	deviceCreateInfo.pNext = &accelerationStructureFeatures;
+	deviceCreateInfo.pNext = nullptr;
 	deviceCreateInfo.flags = 0;
 	deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
@@ -547,4 +541,48 @@ void Instance::createLogicalDevice()
 	// Get the queues.
 	for (auto& queue : m_Queues)
 		m_DeviceTable.vkGetDeviceQueue(m_LogicalDevice, queue.getUnsafe().m_Family, 0, &queue.getUnsafe().m_Queue);
+}
+
+void Instance::createMemoryAllocator()
+{
+	// Setup the Vulkan functions needed by VMA.
+	VmaVulkanFunctions functions = {};
+	functions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+	functions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
+	functions.vkGetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
+	functions.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
+	functions.vkAllocateMemory = m_DeviceTable.vkAllocateMemory;
+	functions.vkFreeMemory = m_DeviceTable.vkFreeMemory;
+	functions.vkMapMemory = m_DeviceTable.vkMapMemory;
+	functions.vkUnmapMemory = m_DeviceTable.vkUnmapMemory;
+	functions.vkFlushMappedMemoryRanges = m_DeviceTable.vkFlushMappedMemoryRanges;
+	functions.vkInvalidateMappedMemoryRanges = m_DeviceTable.vkInvalidateMappedMemoryRanges;
+	functions.vkBindBufferMemory = m_DeviceTable.vkBindBufferMemory;
+	functions.vkBindImageMemory = m_DeviceTable.vkBindImageMemory;
+	functions.vkGetBufferMemoryRequirements = m_DeviceTable.vkGetBufferMemoryRequirements;
+	functions.vkGetImageMemoryRequirements = m_DeviceTable.vkGetImageMemoryRequirements;
+	functions.vkCreateBuffer = m_DeviceTable.vkCreateBuffer;
+	functions.vkDestroyBuffer = m_DeviceTable.vkDestroyBuffer;
+	functions.vkCreateImage = m_DeviceTable.vkCreateImage;
+	functions.vkDestroyImage = m_DeviceTable.vkDestroyImage;
+	functions.vkCmdCopyBuffer = m_DeviceTable.vkCmdCopyBuffer;
+	functions.vkGetBufferMemoryRequirements2KHR = m_DeviceTable.vkGetBufferMemoryRequirements2KHR;
+	functions.vkGetImageMemoryRequirements2KHR = m_DeviceTable.vkGetImageMemoryRequirements2KHR;
+	functions.vkBindBufferMemory2KHR = m_DeviceTable.vkBindBufferMemory2KHR;
+	functions.vkBindImageMemory2KHR = m_DeviceTable.vkBindImageMemory2KHR;
+	functions.vkGetPhysicalDeviceMemoryProperties2KHR = vkGetPhysicalDeviceMemoryProperties2KHR;
+	functions.vkGetDeviceBufferMemoryRequirements = m_DeviceTable.vkGetDeviceBufferMemoryRequirements;
+	functions.vkGetDeviceImageMemoryRequirements = m_DeviceTable.vkGetDeviceImageMemoryRequirements;
+
+	// Setup create info.
+	VmaAllocatorCreateInfo createInfo = {};
+	createInfo.flags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT /*| VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT*/;
+	createInfo.physicalDevice = m_PhysicalDevice;
+	createInfo.device = m_LogicalDevice;
+	createInfo.pVulkanFunctions = &functions;
+	createInfo.instance = m_Instance;
+	createInfo.vulkanApiVersion = volkGetInstanceVersion();
+
+	// Create the allocator.
+	GRAPHITE_VK_ASSERT(vmaCreateAllocator(&createInfo, &m_Allocator.getUnsafe()), "Failed to create the allocator!");
 }
