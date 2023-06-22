@@ -157,7 +157,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		OUTPUT_VARIABLE PLATFORM_CHECK_RESULT
 	)
 	
-	if ("${PLATFORM_CHECK_RESULT}" EQUALS "Type=x11")
+	if ("${PLATFORM_CHECK_RESULT}" STREQUAL "Type=x11")
 	   add_compile_definitions(GRAPHITE_PLATFORM_LINUX_X11)
 	   message(STATUS "X11 detected in Linux.")
 	else()
