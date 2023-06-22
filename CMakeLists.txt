@@ -150,8 +150,8 @@ add_compile_definitions(
 	GRAPHITE_LOG_LEVEL=${GRAPHITE_LOG_LEVEL}
 )
 
-# If we're in Linux, find out if we're using Wayland or X11.
-if ($<PLATFORM_ID:Linux>)
+# If we're in a Unix operating system, find out if we're using Wayland or X11.
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	execute_process(
 		"loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type"
 		OUTPUT_VARIABLE PLATFORM_CHECK_RESULT
