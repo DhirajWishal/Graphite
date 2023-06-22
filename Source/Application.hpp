@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Backend/Instance.hpp"
+
 /**
  * Application class.
  * This is the main application instance and contains all the frontend and backend systems.
@@ -28,6 +30,8 @@ public:
 	int execute();
 
 private:
+	Instance m_Instance;
+
 	int m_ExitCode = 0;
 	bool m_bShoudRun = true;
 };

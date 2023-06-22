@@ -109,6 +109,25 @@ add_library(
 # Make sure to specify the C++ standard to C++20.
 set_property(TARGET GraphiteThirdParty_ImGui PROPERTY CXX_STANDARD 20)
 
+# Add the Volk library as a third party static link.
+add_library(
+	GraphiteThirdParty_volk
+	STATIC 
+
+	"${VOLK_INCLUDE_DIR}/volk.c"
+	"${VOLK_INCLUDE_DIR}/volk.h"
+)
+
+# Set the include directories.
+target_include_directories(
+	GraphiteThirdParty_volk 
+
+	PRIVATE ${VULKAN_HEADERS_INCLUDE_DIR}
+)
+
+# Make sure to specify the C++ standard to C++20.
+set_property(TARGET GraphiteThirdParty_volk PROPERTY CXX_STANDARD 20)
+
 # Set global compile definitions.
 add_compile_definitions(
 	$<$<CONFIG:Debug>:GRAPHITE_DEBUG>
@@ -130,6 +149,22 @@ add_compile_definitions(
 
 	GRAPHITE_LOG_LEVEL=${GRAPHITE_LOG_LEVEL}
 )
+
+# If we're in Linux, find out if we're using Wayland or X11.
+if ($<PLATFORM_ID:Linux>)
+	execute_process(
+		"loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type"
+		OUTPUT_VARIABLE PLATFORM_CHECK_RESULT
+	)
+	
+	if ("${PLATFORM_CHECK_RESULT}" EQUALS "Type=x11")
+	   add_compile_definitions(GRAPHITE_PLATFORM_LINUX_X11)
+	   message(STATUS "X11 detected in Linux.")
+	else()
+	   add_compile_definitions(GRAPHITE_PLATFORM_LINUX_WAYLAND)
+	   message(STATUS "Wayland detected in Linux.")
+	endif()
+endif()
 
 # Add the SDL as a subdirectory.
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SDL)
@@ -161,6 +196,8 @@ if (MSVC)
 	set_target_properties(
 		GraphiteThirdParty_Optick
 		GraphiteThirdParty_ImGui
+		GraphiteThirdParty_volk
+
 		SDL3_test
 		SDL3-shared
 		uninstall

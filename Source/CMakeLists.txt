@@ -58,7 +58,7 @@ target_include_directories(
 )
 
 # Add the target links.
-target_link_libraries(Graphite GraphiteThirdParty_ImGui GraphiteThirdParty_Optick SDL3-shared)
+target_link_libraries(Graphite GraphiteThirdParty_ImGui GraphiteThirdParty_Optick GraphiteThirdParty_volk SDL3-shared)
 
 # Make sure to specify the C++ standard to C++20.
 set_property(TARGET Graphite PROPERTY CXX_STANDARD 20)
