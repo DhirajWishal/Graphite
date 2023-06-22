@@ -23,6 +23,11 @@ set(
 	"Application.hpp"
 
 	"Core/Logging.hpp"
+	"Core/Features.hpp"
+	"Core/Guarded.hpp"
+
+	"Backend/Instance.cpp"
+	"Backend/Instance.hpp"
 
 	${SHADERS}
 )
@@ -41,6 +46,7 @@ add_executable(
 target_include_directories(
 	Graphite 
 
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 	PRIVATE ${IMGUI_INCLUDE_DIR}
 	PRIVATE ${TINYGLTF_INCLUDE_DIR}
 	PRIVATE ${SPDLOG_INCLUDE_DIR}

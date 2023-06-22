@@ -15,6 +15,7 @@ Application::Application()
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		GRAPHITE_LOG_FATAL("Failed to initialize SDL!");
+		m_ExitCode = -1;
 		return;
 	}
 
@@ -35,5 +36,5 @@ int Application::execute()
 		OPTICK_FRAME("Main loop");
 	}
 
-	return 0;
+	return m_ExitCode;
 }

@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include "Features.hpp"
+
 #include <spdlog/spdlog.h>
 
-
-#ifdef __cpp_lib_source_location
-#	if __cpp_lib_source_location == 201907L
+#ifdef GRAPHITE_FEATURE_SOURCE_LOCATION
 #include <source_location>
 
 /**
@@ -22,9 +22,7 @@ void TraceLog(std::source_location&& location, Message&& message)
 	spdlog::info("[Trace \"{}\":{}] {}", location.file_name(), location.line(), std::move(message));
 }
 
-#		define GRAPHITE_TRACE_FUNCTION(format, ...)	::TraceLog(std::source_location::current(), fmt::format(format, __VA_ARGS__))
-
-#endif
+#	define GRAPHITE_TRACE_FUNCTION(format, ...)	::TraceLog(std::source_location::current(), fmt::format(format, __VA_ARGS__))
 
 #else
 #	define GRAPHITE_TRACE_FUNCTION(format, ...)	::spdlog::info("[Trace \"{}\":{}] {}", __FILE__, __LINE__, fmt::format(format, __VA_ARGS__))

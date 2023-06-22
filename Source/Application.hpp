@@ -28,5 +28,6 @@ public:
 	int execute();
 
 private:
+	int m_ExitCode = 0;
 	bool m_bShoudRun = true;
 };
