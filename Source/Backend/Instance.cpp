@@ -466,7 +466,13 @@ void Instance::selectPhysicalDevice()
 	{
 		GRAPHITE_LOG_INFORMATION("The {} extension is not supported and therefore will not be used.", extension.data());
 
+#ifdef GRAPHITE_FEATURE_RANGES
 		auto ret = std::ranges::remove(m_DeviceExtensions, extension);
+
+#else
+		auto ret = std::remove(m_DeviceExtensions.begin(), m_DeviceExtensions.end(), extension);
+
+#endif
 		m_DeviceExtensions.erase(ret.begin());
 	}
 
