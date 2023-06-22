@@ -29,6 +29,12 @@ set(
 
 	"Backend/Instance.cpp"
 	"Backend/Instance.hpp"
+	"Backend/VulkanMacros.hpp"
+	"Backend/Image.hpp"
+	"Backend/Image.cpp"
+	"Backend/InstanceBoundObject.hpp"
+	"Backend/Buffer.hpp"
+	"Backend/Buffer.cpp"
 
 	"Backend/ThirdParty/vk_mem_alloc.cpp"
 

@@ -19,3 +19,9 @@
 #define GRAPHITE_BIT_CAST(from, to)					reinterpret_cast<to>(from)
 
 #endif
+
+#define GRAPHITE_DISABLE_COPY_AND_MOVE(object)					\
+	object(const object&) = delete;								\
+	object(object&&) noexcept = delete;							\
+	object& operator=(const object&) = delete;					\
+	object& operator=(object&&) noexcept = delete
