@@ -22,3 +22,11 @@
 #		define GRAPHITE_FEATURE_RANGES
 #	endif
 #endif
+
+// Check and define the GRAPHITE_FEATURE_BIT_CAST macro if the std::ranges namespace is available.
+#ifdef __cpp_lib_bit_cast
+#	if GRAPHITE_CHECK_FEATURE(__cpp_lib_bit_cast, 201806L)
+// The compiler supports the' __cpp_lib_bit_cast' feature (has support for std::bit_cast).
+#		define GRAPHITE_FEATURE_BIT_CAST
+#	endif
+#endif

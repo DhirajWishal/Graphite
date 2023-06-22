@@ -3,8 +3,11 @@
 #include "Instance.hpp"
 #include "VulkanMacros.hpp"
 
+#include "Core/Common.hpp"
+
 #include <set>
 #include <string_view>
+#include <bit>
 
 namespace /* anonymous */
 {
@@ -101,7 +104,7 @@ namespace /* anonymous */
 		// Else log to the file.
 		else
 		{
-			auto& logFile = std::bit_cast<Instance*>(pUserData)->getLogFile();
+			auto& logFile = GRAPHITE_BIT_CAST(pUserData, Instance*)->getLogFile();
 
 			// Log if the log file is open.
 			if (logFile.is_open())
@@ -304,7 +307,7 @@ Instance::~Instance()
 	m_DeviceTable.vkDestroyDevice(m_LogicalDevice, nullptr);
 
 #ifdef GRAPHITE_DEBUG
-	const auto vkDestroyDebugUtilsMessengerEXT = std::bit_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"));
+	const auto vkDestroyDebugUtilsMessengerEXT = GRAPHITE_BIT_CAST(vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"), PFN_vkDestroyDebugUtilsMessengerEXT);
 	vkDestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 
 #endif // GRAPHITE_DEBUG
@@ -366,7 +369,7 @@ void Instance::createInstance()
 	m_LogFile = std::ofstream("VulkanLogs.txt");
 
 	// Create the debugger.
-	const auto vkCreateDebugUtilsMessengerEXT = std::bit_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"));
+	const auto vkCreateDebugUtilsMessengerEXT = GRAPHITE_BIT_CAST(vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"), PFN_vkCreateDebugUtilsMessengerEXT);
 	GRAPHITE_VK_ASSERT(vkCreateDebugUtilsMessengerEXT(m_Instance, &debugUtilsMessengerCreateInfo, nullptr, &m_DebugMessenger), "Failed to create the debug messenger.");
 
 #endif // GRAPHITE_DEBUG
@@ -468,12 +471,13 @@ void Instance::selectPhysicalDevice()
 
 #ifdef GRAPHITE_FEATURE_RANGES
 		auto ret = std::ranges::remove(m_DeviceExtensions, extension);
+		m_DeviceExtensions.erase(ret.begin());
 
 #else
 		auto ret = std::remove(m_DeviceExtensions.begin(), m_DeviceExtensions.end(), extension);
+		m_DeviceExtensions.erase(ret);
 
 #endif
-		m_DeviceExtensions.erase(ret.begin());
 	}
 
 	// Setup the queue families.

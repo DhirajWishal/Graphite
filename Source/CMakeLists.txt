@@ -25,6 +25,7 @@ set(
 	"Core/Logging.hpp"
 	"Core/Features.hpp"
 	"Core/Guarded.hpp"
+	"Core/Common.hpp"
 
 	"Backend/Instance.cpp"
 	"Backend/Instance.hpp"
