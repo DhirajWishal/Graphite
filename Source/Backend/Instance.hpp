@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Core/Common.hpp"
 #include "Core/Guarded.hpp"
 
 #if defined(GRAPHITE_PLATFORM_WINDOWS)
@@ -56,56 +57,14 @@ public:
 	 */
 	~Instance();
 
-	/**
-	 * Get the Vulkan log file.
-	 * This is file is per-instance and is generated at runtime.
-	 *
-	 * @return The log file.
-	 */
-	[[nodiscard]] std::ofstream& getLogFile() { return m_LogFile; }
-
 public:
-	/**
-	 * Get the graphics queue object.
-	 *
-	 * @return The guarded queue.
-	 */
-	[[nodiscard]] Guarded<VulkanQueue>& getGraphicsQueue() { return m_Queues[0]; }
-
-	/**
-	 * Get the graphics queue object.
-	 *
-	 * @return The guarded queue.
-	 */
-	[[nodiscard]] const Guarded<VulkanQueue>& getGraphicsQueue() const { return m_Queues[0]; }
-
-	/**
-	 * Get the compute queue object.
-	 *
-	 * @return The guarded queue.
-	 */
-	[[nodiscard]] Guarded<VulkanQueue>& getComputeQueue() { return m_Queues[1]; }
-
-	/**
-	 * Get the compute queue object.
-	 *
-	 * @return The guarded queue.
-	 */
-	[[nodiscard]] const Guarded<VulkanQueue>& getComputeQueue() const { return m_Queues[1]; }
-
-	/**
-	 * Get the transfer queue object.
-	 *
-	 * @return The guarded queue.
-	 */
-	[[nodiscard]] Guarded<VulkanQueue>& getTransferQueue() { return m_Queues[2]; }
-
-	/**
-	 * Get the transfer queue object.
-	 *
-	 * @return The guarded queue.
-	 */
-	[[nodiscard]] const Guarded<VulkanQueue>& getTransferQueue() const { return m_Queues[2]; }
+	GRAPHITE_SETUP_GETTERS(std::ofstream, LogFile, m_LogFile);
+	GRAPHITE_SETUP_GETTERS(Guarded<VkPhysicalDevice>, PhysicalDevice, m_PhysicalDevice);
+	GRAPHITE_SETUP_GETTERS(Guarded<VkDevice>, LogicalDevice, m_LogicalDevice);
+	GRAPHITE_SETUP_GETTERS(Guarded<VmaAllocator>, Allocator, m_Allocator);
+	GRAPHITE_SETUP_GETTERS(Guarded<VulkanQueue>, GraphicsQueue, m_Queues[0]);
+	GRAPHITE_SETUP_GETTERS(Guarded<VulkanQueue>, ComputeQueue, m_Queues[1]);
+	GRAPHITE_SETUP_GETTERS(Guarded<VulkanQueue>, TransferQueue, m_Queues[2]);
 
 private:
 	/**
@@ -140,8 +99,8 @@ private:
 	VkInstance m_Instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 
-	VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
-	VkDevice m_LogicalDevice = VK_NULL_HANDLE;
+	Guarded<VkPhysicalDevice> m_PhysicalDevice = VK_NULL_HANDLE;
+	Guarded<VkDevice> m_LogicalDevice = VK_NULL_HANDLE;
 
 	Guarded<VmaAllocator> m_Allocator = nullptr;
 

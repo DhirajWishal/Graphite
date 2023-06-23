@@ -104,7 +104,7 @@ namespace /* anonymous */
 		// Else log to the file.
 		else
 		{
-			auto& logFile = GRAPHITE_BIT_CAST(pUserData, Instance*)->getLogFile();
+			auto& logFile = GRAPHITE_BIT_CAST(Instance*, pUserData)->getLogFile();
 
 			// Log if the log file is open.
 			if (logFile.is_open())
@@ -304,10 +304,10 @@ Instance::Instance()
 
 Instance::~Instance()
 {
-	m_DeviceTable.vkDestroyDevice(m_LogicalDevice, nullptr);
+	m_DeviceTable.vkDestroyDevice(m_LogicalDevice.getUnsafe(), nullptr);
 
 #ifdef GRAPHITE_DEBUG
-	const auto vkDestroyDebugUtilsMessengerEXT = GRAPHITE_BIT_CAST(vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"), PFN_vkDestroyDebugUtilsMessengerEXT);
+	const auto vkDestroyDebugUtilsMessengerEXT = GRAPHITE_BIT_CAST(PFN_vkDestroyDebugUtilsMessengerEXT, vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"));
 	vkDestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 
 #endif // GRAPHITE_DEBUG
@@ -369,7 +369,7 @@ void Instance::createInstance()
 	m_LogFile = std::ofstream("VulkanLogs.txt");
 
 	// Create the debugger.
-	const auto vkCreateDebugUtilsMessengerEXT = GRAPHITE_BIT_CAST(vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"), PFN_vkCreateDebugUtilsMessengerEXT);
+	const auto vkCreateDebugUtilsMessengerEXT = GRAPHITE_BIT_CAST(PFN_vkCreateDebugUtilsMessengerEXT, vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"));
 	GRAPHITE_VK_ASSERT(vkCreateDebugUtilsMessengerEXT(m_Instance, &debugUtilsMessengerCreateInfo, nullptr, &m_DebugMessenger), "Failed to create the debug messenger.");
 
 #endif // GRAPHITE_DEBUG
@@ -452,7 +452,7 @@ void Instance::selectPhysicalDevice()
 	}
 
 	// Check if we found a physical device.
-	if (m_PhysicalDevice == VK_NULL_HANDLE)
+	if (m_PhysicalDevice.getUnsafe() == VK_NULL_HANDLE)
 	{
 		GRAPHITE_LOG_FATAL("Could not find a physical device with the required requirements!");
 		return;
@@ -464,7 +464,7 @@ void Instance::selectPhysicalDevice()
 	GRAPHITE_LOG_INFORMATION("Device Name: {}", m_PhysicalDeviceProperties.deviceName);
 
 	// Get the unsupported render target types.
-	const auto unsupportedExtensions = GetUnsupportedDeviceExtensions(m_PhysicalDevice, m_DeviceExtensions);
+	const auto unsupportedExtensions = GetUnsupportedDeviceExtensions(m_PhysicalDevice.getUnsafe(), m_DeviceExtensions);
 	for (const auto& extension : unsupportedExtensions)
 	{
 		GRAPHITE_LOG_INFORMATION("The {} extension is not supported and therefore will not be used.", extension.data());
@@ -481,9 +481,9 @@ void Instance::selectPhysicalDevice()
 	}
 
 	// Setup the queue families.
-	getGraphicsQueue().getUnsafe().m_Family = FindPhysialDeviceQueueFamily(m_PhysicalDevice, VK_QUEUE_GRAPHICS_BIT);
-	getComputeQueue().getUnsafe().m_Family = FindPhysialDeviceQueueFamily(m_PhysicalDevice, VK_QUEUE_COMPUTE_BIT);
-	getTransferQueue().getUnsafe().m_Family = FindPhysialDeviceQueueFamily(m_PhysicalDevice, VK_QUEUE_TRANSFER_BIT);
+	getGraphicsQueue().getUnsafe().m_Family = FindPhysialDeviceQueueFamily(m_PhysicalDevice.getUnsafe(), VK_QUEUE_GRAPHICS_BIT);
+	getComputeQueue().getUnsafe().m_Family = FindPhysialDeviceQueueFamily(m_PhysicalDevice.getUnsafe(), VK_QUEUE_COMPUTE_BIT);
+	getTransferQueue().getUnsafe().m_Family = FindPhysialDeviceQueueFamily(m_PhysicalDevice.getUnsafe(), VK_QUEUE_TRANSFER_BIT);
 }
 
 void Instance::createLogicalDevice()
@@ -543,14 +543,14 @@ void Instance::createLogicalDevice()
 #endif // GRAPHITE_DEBUG
 
 	// Create the device.
-	GRAPHITE_VK_ASSERT(vkCreateDevice(m_PhysicalDevice, &deviceCreateInfo, nullptr, &m_LogicalDevice), "Failed to create the logical device!");
+	GRAPHITE_VK_ASSERT(vkCreateDevice(m_PhysicalDevice.getUnsafe(), &deviceCreateInfo, nullptr, &m_LogicalDevice.getUnsafe()), "Failed to create the logical device!");
 
 	// Load the device table.
-	volkLoadDeviceTable(&m_DeviceTable, m_LogicalDevice);
+	volkLoadDeviceTable(&m_DeviceTable, m_LogicalDevice.getUnsafe());
 
 	// Get the queues.
 	for (auto& queue : m_Queues)
-		m_DeviceTable.vkGetDeviceQueue(m_LogicalDevice, queue.getUnsafe().m_Family, 0, &queue.getUnsafe().m_Queue);
+		m_DeviceTable.vkGetDeviceQueue(m_LogicalDevice.getUnsafe(), queue.getUnsafe().m_Family, 0, &queue.getUnsafe().m_Queue);
 }
 
 void Instance::createMemoryAllocator()
@@ -587,8 +587,8 @@ void Instance::createMemoryAllocator()
 	// Setup create info.
 	VmaAllocatorCreateInfo createInfo = {};
 	createInfo.flags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT /*| VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT*/;
-	createInfo.physicalDevice = m_PhysicalDevice;
-	createInfo.device = m_LogicalDevice;
+	createInfo.physicalDevice = m_PhysicalDevice.getUnsafe();
+	createInfo.device = m_LogicalDevice.getUnsafe();
 	createInfo.pVulkanFunctions = &functions;
 	createInfo.instance = m_Instance;
 	createInfo.vulkanApiVersion = volkGetInstanceVersion();

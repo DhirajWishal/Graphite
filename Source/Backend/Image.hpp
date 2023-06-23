@@ -8,7 +8,7 @@
  * Image class.
  * This is the base class for all the supported images of the engine.
  */
-class Image : public InstanceBoundObject
+class Image final : public InstanceBoundObject
 {
 public:
 	/**
@@ -22,33 +22,13 @@ public:
 	 */
 	explicit Image(Instance& instance, uint32_t width, uint32_t height, uint32_t depth, VkFormat format);
 
-	/**
-	 * Get the width of the image.
-	 *
-	 * @return The width of the image.
-	 */
-	[[nodiscard]] uint32_t getWidth() const { return m_Width; }
-
-	/**
-	 * Get the height of the image.
-	 *
-	 * @return The height of the image.
-	 */
-	[[nodiscard]] uint32_t getHeight() const { return m_Height; }
-
-	/**
-	 * Get the depth of the image.
-	 *
-	 * @return The depth of the image.
-	 */
-	[[nodiscard]] uint32_t getDepth() const { return m_Depth; }
-
-	/**
-	 * Get the format of the image.
-	 *
-	 * @return The format of the image.
-	 */
-	[[nodiscard]] VkFormat getFormat() const { return m_Format; }
+public:
+	GRAPHITE_SETUP_SIMPLE_GETTER(uint32_t, Width, m_Width);
+	GRAPHITE_SETUP_SIMPLE_GETTER(uint32_t, Height, m_Height);
+	GRAPHITE_SETUP_SIMPLE_GETTER(uint32_t, Depth, m_Depth);
+	GRAPHITE_SETUP_SIMPLE_GETTER(VkFormat, Format, m_Format);
+	GRAPHITE_SETUP_SIMPLE_GETTER(VkImage, Image, m_Image);
+	GRAPHITE_SETUP_SIMPLE_GETTER(VmaAllocation, ImageMemory, m_ImageMemory);
 
 private:
 	uint32_t m_Width = 0;

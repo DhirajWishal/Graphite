@@ -6,6 +6,11 @@
 
 #include <cstdint>
 
+#ifndef VK_NO_PROTOTYPES
+#	define VK_NO_PROTOTYPES
+
+#endif
+
 #include <vk_mem_alloc.h>
 
 class Instance;

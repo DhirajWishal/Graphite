@@ -13,15 +13,21 @@
 #endif
 
 #ifdef GRAPHITE_FEATURE_BIT_CAST
-#define GRAPHITE_BIT_CAST(from, to)					std::bit_cast<to>(from)
+#define GRAPHITE_BIT_CAST(to, from)					std::bit_cast<to>(from)
 
 #else
-#define GRAPHITE_BIT_CAST(from, to)					reinterpret_cast<to>(from)
+#define GRAPHITE_BIT_CAST(to, from)					reinterpret_cast<to>(from)
 
 #endif
 
-#define GRAPHITE_DISABLE_COPY_AND_MOVE(object)					\
-	object(const object&) = delete;								\
-	object(object&&) noexcept = delete;							\
-	object& operator=(const object&) = delete;					\
+#define GRAPHITE_SETUP_SIMPLE_GETTER(type, name, variable)	[[nodiscard]] type get##name() const { return variable; }
+
+#define GRAPHITE_SETUP_GETTERS(type, name, variable)					\
+	[[nodiscard]] const type& get##name() const { return variable; }	\
+	[[nodiscard]] type& get##name() { return variable; }
+
+#define GRAPHITE_DISABLE_COPY_AND_MOVE(object)							\
+	object(const object&) = delete;										\
+	object(object&&) noexcept = delete;									\
+	object& operator=(const object&) = delete;							\
 	object& operator=(object&&) noexcept = delete

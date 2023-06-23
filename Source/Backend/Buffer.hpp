@@ -8,23 +8,27 @@
  * Buffer class.
  * This class contains a single Vulkan buffer object.
  */
-class Buffer : public InstanceBoundObject
+class Buffer final : public InstanceBoundObject
 {
 public:
 	/**
 	 * Explicit constructor.
 	 *
 	 * @param instance The instance reference.
-	 * @param size The size of the buffer.s
+	 * @param size The size of the buffer.
+	 * @param usage The buffer usage.
 	 */
-	explicit Buffer(Instance& instance, uint64_t size);
+	explicit Buffer(Instance& instance, uint64_t size, VkBufferUsageFlags usage);
 
 	/**
-	 * Get the size of the buffer.
-	 *
-	 * @return The size in bytes.
+	 * Destructor.
 	 */
-	[[nodiscard]] uint64_t getSize() const { return m_Size; }
+	~Buffer() override;
+
+public:
+	GRAPHITE_SETUP_SIMPLE_GETTER(uint64_t, Size, m_Size);
+	GRAPHITE_SETUP_SIMPLE_GETTER(VkBuffer, Buffer, m_Buffer);
+	GRAPHITE_SETUP_SIMPLE_GETTER(VmaAllocation, BufferMemory, m_BufferMemory);
 
 private:
 	uint64_t m_Size = 0;
