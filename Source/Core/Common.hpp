@@ -31,3 +31,8 @@
 	object(object&&) noexcept = delete;									\
 	object& operator=(const object&) = delete;							\
 	object& operator=(object&&) noexcept = delete
+
+#define GRAPHITE_SETUP_CHAIN_ENTRY(object, type, name)							\
+	const type& get##name() const { return m_##name; }							\
+	object& set##name(const type& value) { m_##name = value; return *this; }	\
+	type m_##name

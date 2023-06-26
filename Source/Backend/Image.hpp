@@ -4,6 +4,24 @@
 
 #include "InstanceBoundObject.hpp"
 
+#include <vector>
+
+/**
+ * Image builder class.
+ */
+struct ImageBuilder final
+{
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, uint32_t, Width) = 0;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, uint32_t, Height) = 0;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, uint32_t, Depth) = 1;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, VkImageType, Type) = VK_IMAGE_TYPE_2D;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, VkImageUsageFlags, Usage) = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, VkSampleCountFlagBits, Samples) = VK_SAMPLE_COUNT_1_BIT;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, uint32_t, Layers) = 1;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, bool, EnableMipMaps) = true;
+	GRAPHITE_SETUP_CHAIN_ENTRY(ImageBuilder, bool, IsCubeMap) = false;
+};
+
 /**
  * Image class.
  * This is the base class for all the supported images of the engine.
@@ -15,12 +33,19 @@ public:
 	 * Explicit constructor.
 	 *
 	 * @param instance The instance reference.
-	 * @param width The width of the image.
-	 * @param height The height of the image.
-	 * @param depth The depth of the image.
+	 * @param builder The image builder structure.
 	 * @param format The image format to use.
 	 */
-	explicit Image(Instance& instance, uint32_t width, uint32_t height, uint32_t depth, VkFormat format);
+	explicit Image(Instance& instance, const ImageBuilder& builder, VkFormat format);
+
+	/**
+	 * Explicit constructor.
+	 *
+	 * @param instance The instance reference.
+	 * @param builder The image builder structure.
+	 * @param formats The candidate image formats to use. The class will find the best format from the given list. Make sure to have the formats in the best to worst order.
+	 */
+	explicit Image(Instance& instance, const ImageBuilder& builder, std::vector<VkFormat> formats);
 
 public:
 	GRAPHITE_SETUP_SIMPLE_GETTER(uint32_t, Width, m_Width);
