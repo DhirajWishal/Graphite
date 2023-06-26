@@ -5,24 +5,6 @@
 #include "Core/Common.hpp"
 #include "Core/Guarded.hpp"
 
-#if defined(GRAPHITE_PLATFORM_WINDOWS)
-#	define VK_USE_PLATFORM_WIN32_KHR
-
-#elif defined(GRAPHITE_PLATFORM_MAC)
-#	define VK_USE_PLATFORM_MACOS_MVK
-
-#elif defined(GRAPHITE_PLATFORM_LINUX_X11)
-#	define VK_USE_PLATFORM_XLIB_KHR
-#	define VK_USE_PLATFORM_XCB_KHR
-
-#elif defined(GRAPHITE_PLATFORM_LINUX_WAYLAND)
-#	define VK_USE_PLATFORM_WAYLAND_KHR
-
-#else 
-#	error Unsupported platform!
-
-#endif
-
 #include <volk.h>
 #include <vk_mem_alloc.h>
 
@@ -60,6 +42,7 @@ public:
 public:
 	GRAPHITE_SETUP_GETTERS(std::ofstream, LogFile, m_LogFile);
 	GRAPHITE_SETUP_SIMPLE_GETTER(VkInstance, Instance, m_Instance);
+	GRAPHITE_SETUP_GETTERS(VolkDeviceTable, DeviceTable, m_DeviceTable);
 	GRAPHITE_SETUP_GETTERS(Guarded<VkPhysicalDevice>, PhysicalDevice, m_PhysicalDevice);
 	GRAPHITE_SETUP_GETTERS(Guarded<VkDevice>, LogicalDevice, m_LogicalDevice);
 	GRAPHITE_SETUP_GETTERS(Guarded<VmaAllocator>, Allocator, m_Allocator);

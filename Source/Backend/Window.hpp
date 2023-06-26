@@ -24,6 +24,11 @@ public:
 	explicit Window(Instance& instance, std::string_view title);
 
 	/**
+	 * Destructor.
+	 */
+	~Window() override;
+
+	/**
 	 * Update the window.
 	 * This will also poll for inputs.
 	 */

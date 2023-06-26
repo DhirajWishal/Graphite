@@ -62,14 +62,14 @@ Window::Window(Instance& instance, std::string_view title)
 	// Set this class as user data.
 	SDL_SetWindowData(m_pWindow, "this", this);
 
-	// Make sure to show the window.
-	// SDL_ShowWindow(m_pWindow);
-
 	// Create the window surface.
 	if (SDL_Vulkan_CreateSurface(m_pWindow, m_Instance.getInstance(), &m_Surface) == SDL_FALSE)
-	{
 		GRAPHITE_LOG_FATAL("Failed to create the Vulkan surface!");
-	}
+}
+
+Window::~Window()
+{
+	vkDestroySurfaceKHR(m_Instance.getInstance(), m_Surface, nullptr);
 }
 
 void Window::update()
