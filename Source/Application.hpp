@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Backend/Instance.hpp"
+#include "Backend/Window.hpp"
 
 /**
  * Application class.
@@ -31,6 +32,7 @@ public:
 
 private:
 	Instance m_Instance;
+	Window m_Window;
 
 	int m_ExitCode = 0;
 	bool m_bShoudRun = true;

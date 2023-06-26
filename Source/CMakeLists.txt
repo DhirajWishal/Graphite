@@ -35,6 +35,8 @@ set(
 	"Backend/InstanceBoundObject.hpp"
 	"Backend/Buffer.hpp"
 	"Backend/Buffer.cpp"
+	"Backend/Window.hpp"
+	"Backend/Window.cpp"
 
 	"Backend/ThirdParty/vk_mem_alloc.cpp"
 

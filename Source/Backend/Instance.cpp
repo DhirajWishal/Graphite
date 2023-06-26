@@ -5,6 +5,8 @@
 
 #include "Core/Common.hpp"
 
+#include <SDL3/SDL_vulkan.h>
+
 #include <set>
 #include <string_view>
 #include <bit>
@@ -18,54 +20,20 @@ namespace /* anonymous */
 	 */
 	[[nodiscard]] std::vector<const char*> GetRequiredInstanceExtensions()
 	{
-		std::vector<const char*> extensions = { VK_KHR_SURFACE_EXTENSION_NAME , VK_KHR_DISPLAY_EXTENSION_NAME };
+		// Get the extensions.
+		unsigned int count = 0;
+		if (SDL_Vulkan_GetInstanceExtensions(&count, nullptr) == SDL_FALSE)
+		{
+			GRAPHITE_LOG_FATAL("Failed to get the instance extension count from SDL!");
+			return {};
+		}
 
-#if defined(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_FUCHSIA_IMAGEPIPE_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_FUCHSIA_IMAGEPIPE_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_FUCHSIA_IMAGEPIPE_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_FUCHSIA_IMAGEPIPE_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_MVK_IOS_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_MVK_IOS_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_MVK_MACOS_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_EXT_METAL_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_NN_VI_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_NN_VI_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_KHR_WIN32_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_KHR_XCB_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_KHR_XLIB_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_EXT_DIRECTFB_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_EXT_DIRECTFB_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_EXT_ACQUIRE_XLIB_DISPLAY_EXTENSION_NAME)
-		extensions.emplace_back(VK_EXT_ACQUIRE_XLIB_DISPLAY_EXTENSION_NAME);
-
-#elif defined(VK_GGP_STREAM_DESCRIPTOR_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_GGP_STREAM_DESCRIPTOR_SURFACE_EXTENSION_NAME);
-
-#elif defined(VK_QNX_SCREEN_SURFACE_EXTENSION_NAME)
-		extensions.emplace_back(VK_QNX_SCREEN_SURFACE_EXTENSION_NAME);
-
-#endif
+		std::vector<const char*> extensions(count);
+		if (SDL_Vulkan_GetInstanceExtensions(&count, extensions.data()) == SDL_FALSE)
+		{
+			GRAPHITE_LOG_FATAL("Failed to get the instance extensions from SDL!");
+			return {};
+		}
 
 #ifdef GRAPHITE_DEBUG
 		extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -282,12 +250,19 @@ namespace /* anonymous */
 
 Instance::Instance()
 {
+	// Load the Vulkan library to SDL.
+	if (SDL_Vulkan_LoadLibrary(nullptr) != 0)
+	{
+		GRAPHITE_LOG_FATAL("Failed to load the Vulkan library in SDL! {}", SDL_GetError());
+		return;
+	}
+
 	// Set up the device extensions.
 	m_DeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	m_DeviceExtensions.emplace_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
 
 	// Initialize Volk.
-	volkInitialize();
+	volkInitializeCustom(GRAPHITE_BIT_CAST(PFN_vkGetInstanceProcAddr, SDL_Vulkan_GetVkGetInstanceProcAddr()));
 
 	// Create the instance.
 	createInstance();

@@ -59,6 +59,7 @@ public:
 
 public:
 	GRAPHITE_SETUP_GETTERS(std::ofstream, LogFile, m_LogFile);
+	GRAPHITE_SETUP_SIMPLE_GETTER(VkInstance, Instance, m_Instance);
 	GRAPHITE_SETUP_GETTERS(Guarded<VkPhysicalDevice>, PhysicalDevice, m_PhysicalDevice);
 	GRAPHITE_SETUP_GETTERS(Guarded<VkDevice>, LogicalDevice, m_LogicalDevice);
 	GRAPHITE_SETUP_GETTERS(Guarded<VmaAllocator>, Allocator, m_Allocator);

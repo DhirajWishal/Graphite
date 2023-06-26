@@ -4,26 +4,15 @@
 
 #include "Core/Logging.hpp"
 
-#include <SDL3/SDL.h>
 #include <optick.h>
 
 Application::Application()
+	: m_Window(m_Instance, "Graphite Engine")
 {
-	// Try and initialize SDL.
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
-	{
-		GRAPHITE_LOG_FATAL("Failed to initialize SDL!");
-		m_ExitCode = -1;
-		return;
-	}
-
-	GRAPHITE_LOG_INFORMATION("SDL initialized successfully.");
 }
 
 Application::~Application()
 {
-	// Quit SDL.
-	SDL_Quit();
 }
 
 int Application::execute()
@@ -32,6 +21,7 @@ int Application::execute()
 	while (m_bShoudRun)
 	{
 		OPTICK_FRAME("Main loop");
+		m_Window.update();
 	}
 
 	return m_ExitCode;
