@@ -55,14 +55,16 @@ public:
 	 * Safely access the stored variable.
 	 *
 	 * @tparam Function The callback function type.
+	 * @tparam Arguments The argument types that will be passed to the function AFTER the variable.
 	 * @param function The function that will be called.
+	 * @param arguments The arguments to be forwarded to the function callback AFTER the variable.
 	 * @return The return of the function.
 	 */
-	template<class Function>
-	decltype(auto) access(Function&& function)
+	template<class Function, class... Arguments>
+	decltype(auto) access(Function&& function, Arguments&&... arguments)
 	{
 		const auto lock = std::scoped_lock(m_Mutex);
-		return function(m_Variable);
+		return function(m_Variable, std::forward<Arguments>(arguments)...);
 	}
 
 	/**
@@ -139,7 +141,7 @@ public:
 
 	/**
 	 * Value copy assign operator.
-	 * 
+	 *
 	 * @param value the value to assign.
 	 * @return The guarded lock reference.
 	 */

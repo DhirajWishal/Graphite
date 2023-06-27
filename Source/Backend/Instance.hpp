@@ -39,6 +39,11 @@ public:
 	 */
 	~Instance();
 
+	/**
+	 * Wait idle till all the commands are done.
+	 */
+	void waitIdle();
+
 public:
 	GRAPHITE_SETUP_GETTERS(std::ofstream, LogFile, m_LogFile);
 	GRAPHITE_SETUP_SIMPLE_GETTER(VkInstance, Instance, m_Instance);

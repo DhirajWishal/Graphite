@@ -7,6 +7,8 @@
 
 #include <SDL3/SDL_vulkan.h>
 
+#include <optick.h>
+
 #include <set>
 #include <string_view>
 #include <bit>
@@ -288,6 +290,17 @@ Instance::~Instance()
 #endif // GRAPHITE_DEBUG
 
 	vkDestroyInstance(m_Instance, nullptr);
+}
+
+void Instance::waitIdle()
+{
+	OPTICK_EVENT();
+
+	m_LogicalDevice.access([this](VkDevice logicalDevice)
+		{
+			m_DeviceTable.vkDeviceWaitIdle(logicalDevice);
+		}
+	);
 }
 
 void Instance::createInstance()
